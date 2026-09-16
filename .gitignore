@@ -1,0 +1,11 @@
+__pycache__/
+.env
+*.pyc
+venv/
+.venv/
+*.pt
+*.bin
+*.safetensors
+data/
+models/
+.vscode/

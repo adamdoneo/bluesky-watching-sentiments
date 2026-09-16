@@ -1,0 +1,33 @@
+#using lightweight python 3.12 debian image
+FROM python:3.12-slim
+
+#set the working directory to /app
+WORKDIR /app
+
+#using the cpu-only version of pytorch to save space
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+
+#copies the requirements txt file into local dir, and runs pip install on all items
+#use --no-cache-dir flag to not retain leftover install files to save space
+COPY docker/requirements-pipeline.txt .
+RUN pip install --no-cache-dir -r requirements-pipeline.txt
+
+# download the spacy nlp model at build time, to not have to download it each time the container is spun up
+#this uses the spacy commmand line function
+RUN python -m spacy download en_core_web_trf
+
+#download the huggingface cardiffnlp/twitter-roberta-base-sentiment-latest model at build time
+#huggingface doesnt have a command line function to download models, so we use the transformers 
+#pipeline function to download the model 
+RUN python -c "from transformers import pipeline; pipeline('sentiment-analysis', model='cardiffnlp/twitter-roberta-base-sentiment-latest')"
+
+#download the fine-tuned classifier for this project, uploaded to huggingface hub
+RUN python -c "from transformers import pipeline; pipeline('text-classification', model='adamdoneo/viewing-reaction-classifier')"
+
+# copy pipeline.py file into the container
+COPY pipeline.py .
+COPY utils.py .
+
+#run the pipeline.py file once the container is spun up
+CMD ["python", "pipeline.py"]

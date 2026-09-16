@@ -1,0 +1,27 @@
+#using lightweight python 3.12 debian image
+
+FROM python:3.12-slim
+
+#set the working directory to /app
+WORKDIR /app
+
+#update pip installer, then copy the requirements and install the required libraries
+RUN pip install --no-cache-dir --upgrade pip
+COPY docker/requirements-dashboard.txt .
+RUN pip install --no-cache-dir -r requirements-dashboard.txt
+
+#copy the streamlit_dashboard.py into the directory
+COPY streamlit_dashboard.py .
+
+#specify that this containers routes web traffic through port 8501
+EXPOSE 8501
+
+#set streamlit configs
+ENV STREAMLIT_SERVER_PORT=8501
+#setting to 0.0.0.0 allows external network traffic to reach container
+ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
+#run headless to prevent the container from trying to open a browser window each time
+ENV STREAMLIT_SERVER_HEADLESS=true
+
+#start the streamlit server when the container is spun up
+CMD ["streamlit", "run", "streamlit_dashboard.py"]

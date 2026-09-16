@@ -1,0 +1,25 @@
+
+services:
+#dashboard service, to visualize the output of the pipeline
+  dashboard:
+    build:
+      #set the context to  one dir up
+      context: ..
+      dockerfile: docker/Dockerfile.dashboard
+    container_name: bluesky_dashboard
+    #run on the default streamlit port 8501, and map it to the same port on the host machine
+    ports:
+      - "8501:8501"
+    env_file:
+      - ../.env
+    restart: unless-stopped
+
+#pipeline service, to run the pipeline and set the output as csvs in azure blob storage (read by dashboard)
+  pipeline:
+    build:
+      #set the context to  one dir up
+      context: ..
+      dockerfile: docker/Dockerfile.pipe
+    container_name: bluesky_pipeline
+    env_file:
+      - ../.env
