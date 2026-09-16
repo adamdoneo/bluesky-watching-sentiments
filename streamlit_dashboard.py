@@ -10,7 +10,7 @@ from azure.storage.blob import BlobServiceClient
 import io
 from dotenv import load_dotenv
 
-load_dotenv() 
+load_dotenv()
 
 st.set_page_config(page_title="3-hourly Bluesky Sentiment Dashboard", layout="wide")
 st.title("3-hourly Bluesky Movie & TV-Show Sentiment Dashboard")
